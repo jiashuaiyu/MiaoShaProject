@@ -4,13 +4,24 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+<!--  声明自己的group_Id,项目名字和版本号-->
   <groupId>org.example</groupId>
   <artifactId>MiaoShaProject</artifactId>
   <version>1.0-SNAPSHOT</version>
 
+<!--  对应的项目名称-->
   <name>MiaoShaProject</name>
   <!-- FIXME change it to the project's website -->
   <url>http://www.example.com</url>
+
+
+<!--  指定父pom文件的路径，是springboot提供的一个-->
+  <parent>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <groupId>org.springframework.boot</groupId>
+    <version>2.5.4</version>
+  </parent>
+
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -19,6 +30,33 @@
   </properties>
 
   <dependencies>
+
+<!--    使用了父pom中的springboot起步依赖，会下载这个依赖-->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+
+<!--    导入mysql依赖-->
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+    </dependency>
+
+<!--    设置管理mysql的连接池，这里采用阿里巴巴德鲁伊连接池-->
+    <dependency>
+      <groupId>com.alibaba</groupId>
+      <artifactId>druid</artifactId>
+      <version>1.1.3</version>
+    </dependency>
+
+<!--    下载springboot对mybatis的支持-->
+    <dependency>
+      <groupId>org.mybatis.spring.boot</groupId>
+      <artifactId>mybatis-spring-boot-starter</artifactId>
+      <version>1.3.1</version>
+    </dependency>
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -69,6 +107,60 @@
           <artifactId>maven-project-info-reports-plugin</artifactId>
           <version>3.0.0</version>
         </plugin>
+
+<!--        使用mybatis自动生成工具，生成一个数据库文件的映射-->
+<!--        首先引入mybatis自动生成文件的插件-->
+        <plugin>
+          <groupId>org.mybatis.generator</groupId>
+          <artifactId>mybatis-generator-maven-plugin</artifactId>
+          <version>1.3.5</version>
+
+<!--          生成对应的plugin需要一些dependencies-->
+          <dependencies>
+            <dependency>
+              <groupId>org.mybatis.generator</groupId>
+              <artifactId>mybatis-generator-core</artifactId>
+              <version>1.3.5</version>
+            </dependency>
+
+<!--            因为本项目使用的是mysql数据库，所以需要对mysql数据库做一个解析-->
+            <dependency>
+              <groupId>mysql</groupId>
+              <artifactId>mysql-connector-java</artifactId>
+            </dependency>
+          </dependencies>
+
+<!--          指定导入之后要做的处理-->
+          <executions>
+            <execution>
+<!--              名字随便起-->
+              <id>mybatis generator</id>
+<!--              阶段在package阶段-->
+              <phase>package</phase>
+<!--              目的-->
+              <goals>
+                <goal>generate</goal>
+              </goals>
+            </execution>
+          </executions>
+
+<!--          考虑到实际项目中会有反复生成文件的情况，所以加一些配置-->
+          <configuration>
+<!--            允许移动生成的文件-->
+            <verbose>true</verbose>
+
+<!--            允许自动覆盖，实际项目开发中不能设置成true，会覆盖别人的成果-->
+            <overwrite>true</overwrite>
+
+<!--            mybatis generation 配置文件的路径-->
+            <configurationFile>
+              src/main/resources/mybatis-generator.xml
+            </configurationFile>
+
+          </configuration>
+
+        </plugin>
+        
       </plugins>
     </pluginManagement>
   </build>
