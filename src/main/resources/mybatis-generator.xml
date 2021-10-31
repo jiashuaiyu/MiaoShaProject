@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--上面的第一行是文件头-->
+
+<!--配置-->
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+<!--    <classPathEntry location="/Program Files/IBM/SQLLIB/java/db2java.zip" />-->
+
+<!--    id代表context的名字，无所谓， targetRuntime,我们采用mybatis3的版本-->
+    <context id="DB2Tables" targetRuntime="MyBatis3">
+<!--        数据库连接地址以及账号密码-->
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://127.0.0.1:3306/miaosha"
+                        userId="root"
+                        password="root">
+        </jdbcConnection>
+
+        <javaTypeResolver >
+            <property name="forceBigDecimals" value="false" />
+        </javaTypeResolver>
+
+<!--        生成DataObject类存放位置-->
+<!--        数据库中共有两张表，这两张表会分别建一个dataObject到这个目录下-->
+        <javaModelGenerator targetPackage="org.example.dataobject" targetProject="src/main/java">
+            <property name="enableSubPackages" value="true" />
+            <property name="trimStrings" value="true" />
+        </javaModelGenerator>
+
+<!--        生成映射文件的存放位置-->
+        <sqlMapGenerator targetPackage="mapping"  targetProject="src/main/resources">
+            <property name="enableSubPackages" value="true" />
+        </sqlMapGenerator>
+
+<!--        生成Dao类的存放位置-->
+<!--        客户端代码，生成易于使用的针对Model对象和XML配置文件的代码
+            type="ANNOTATEDMAPPER",生成java model 和基于注解的mapper对象
+            type="MIXEDMAPPER",生成基于注解的java model 和相应的mapper对象
+            typr="XMLMAPPER",生成SQLMap XML文件和独立的Mapper接口
+-->
+        <javaClientGenerator type="XMLMAPPER" targetPackage="org.example.dao"  targetProject="src/main/java">
+            <property name="enableSubPackages" value="true" />
+        </javaClientGenerator>
+
+<!--        生成对应表及类名-->
+        <table tableName="user_info" domainObjectName="UserDO"></table>
+        <table tableName="user_password" domainObjectName="UserPasswordDO"></table>
+
+
+        <table schema="DB2ADMIN" tableName="ALLTYPES" domainObjectName="Customer" >
+            <property name="useActualColumnNames" value="true"/>
+            <generatedKey column="ID" sqlStatement="DB2" identity="true" />
+            <columnOverride column="DATE_FIELD" property="startDate" />
+            <ignoreColumn column="FRED" />
+            <columnOverride column="LONG_VARCHAR_FIELD" jdbcType="VARCHAR" />
+        </table>
+
+    </context>
+</generatorConfiguration>
