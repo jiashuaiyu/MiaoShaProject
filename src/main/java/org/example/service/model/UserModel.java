@@ -9,12 +9,13 @@ public class UserModel {
     private Integer id;
     private String name;
     private Byte gender;
-    private String age;
+    private Integer age;
     private String telphone;
     private String registerMode;
     private String thirdPartId;
 
     private String encrptPassword;
+
 
 
     /**
@@ -23,6 +24,15 @@ public class UserModel {
      * set()是给属性赋值的，get()是取得属性值的
      * @return
      */
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
 
     public String getEncrptPassword() {
         return encrptPassword;
@@ -55,14 +65,6 @@ public class UserModel {
 
     public void setGender(Byte gender) {
         this.gender = gender;
-    }
-
-    public String getAge() {
-        return age;
-    }
-
-    public void setAge(String age) {
-        this.age = age;
     }
 
     public String getTelphone() {

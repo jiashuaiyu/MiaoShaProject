@@ -32,6 +32,16 @@ public class UserServiceImpl implements UserService {
 //        根据主键id获取到userDo的对象
         UserDO userDO = userDOMapper.selectByPrimaryKey(id);
 
+        if (userDO==null)
+        {
+            return null;
+        }
+//        这个方法不是配置文件自动生成的，我们要自行配置xml文件和dao包中的文件
+//        通过用户id获取对应的用户加密密码信息
+        UserPasswordDO userPasswordDO = userPasswordDOMapper.selectByUserId(userDO.getId());
+
+        return convertFromDataObject(userDO, userPasswordDO);
+
 
 
     }
