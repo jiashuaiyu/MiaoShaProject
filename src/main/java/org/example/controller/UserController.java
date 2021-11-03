@@ -13,12 +13,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
 
 //@Controller("user")用来指定controller的标记，使得它能被spring扫描到，这个controller标记的名字叫user
 //@RequestMapping("/user")  使得这个可以在浏览器上通过/user被访问到
 @Controller("user")
 @RequestMapping("/user")
-public class UserController {
+public class UserController extends BaseController{
 
     @Autowired
     private UserService userService;
@@ -34,6 +36,7 @@ public class UserController {
         {
 //            错误被抛到了tomcat容器层
             throw new BusinessException(EmBusinessError.USER_NOT_EXIST);
+//            userModel.setEncrptPassword("123");
         }
 
 //        将核心领域模型用户对象转化为可供用户使用的viewobject
@@ -55,15 +58,5 @@ public class UserController {
         return userVO;
     }
 
-//    定义exceptionHandler解决未被controller层吸收的exception
-//    @ExceptionHandler()需要设置发生什么样的错误之后就可以进入他的环节，此处设置的是Exception根类
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.OK)
-    public Object handlerException(HttpServletRequest request, Exception ex){
 
-        CommonReturnType commonReturnType = new CommonReturnType();
-        commonReturnType.setStatus("fail");
-        commonReturnType.setData(ex);
-        return commonReturnType;
-    }
 }
