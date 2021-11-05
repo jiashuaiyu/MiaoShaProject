@@ -19,8 +19,10 @@ import java.util.Random;
 
 //@Controller("user")用来指定controller的标记，使得它能被spring扫描到，这个controller标记的名字叫user
 //@RequestMapping("/user")  使得这个可以在浏览器上通过/user被访问到
+//@CrossOrigin 通过这个注解就可以完成所有的springboot对应返回web请求当中加上跨域allow-head标签
 @Controller("user")
 @RequestMapping("/user")
+@CrossOrigin
 public class UserController extends BaseController{
 
     @Autowired
@@ -31,7 +33,7 @@ public class UserController extends BaseController{
 
 
 //    用户获取OPT短信接口
-    @RequestMapping("/getopt")
+    @RequestMapping(value = "/getopt", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
     public CommonReturnType getOpt(@RequestParam(name = "telephone")String telephone){
 

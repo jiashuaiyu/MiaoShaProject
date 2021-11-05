@@ -13,6 +13,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BaseController {
+
+    public static final String CONTENT_TYPE_FORMED="application/x-www-form-urlencoded";
+
+
+
     //    定义exceptionHandler解决未被controller层吸收的exception
 //    @ExceptionHandler()需要设置发生什么样的错误之后就可以进入他的环节，此处设置的是Exception根类
     @ExceptionHandler(Exception.class)
