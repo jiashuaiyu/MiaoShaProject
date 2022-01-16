@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import org.apache.tomcat.util.security.MD5Encoder;
 import org.example.controller.viewobject.UserVO;
 import org.example.error.BusinessException;
 import org.example.error.EmBusinessError;
@@ -8,21 +9,37 @@ import org.example.service.UserService;
 import org.example.service.model.UserModel;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import sun.misc.BASE64Encoder;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.beans.Encoder;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-//@Controller("user")用来指定controller的标记，使得它能被spring扫描到，这个controller标记的名字叫user
-//@RequestMapping("/user")  使得这个可以在浏览器上通过/user被访问到
-//@CrossOrigin 通过这个注解就可以完成所有的springboot对应返回web请求当中加上跨域allow-head标签
+/**
+ * @Controller("user")用来指定controller的标记，使得它能被spring扫描到，这个controller标记的名字叫user
+ * @RequestMapping("/user")  使得这个可以在浏览器上通过/user被访问到
+ * @CrossOrigin 通过这个注解就可以完成所有的springboot对应返回web请求当中加上跨域allow-head标签
+ * @CrossOrigin无法做到Session共享
+ * DEFAULT_ALLOWED_HEADERS:允许跨域传输所有的header参数，将用于使用token放入header域做session共享的跨域请求
+ *
+ */
+//@CrossOrigin(allowCredentials =  "true", allowedHeaders = "*")
 @Controller("user")
 @RequestMapping("/user")
-@CrossOrigin
+@CrossOrigin(allowCredentials =  "true", allowedHeaders = "*")
 public class UserController extends BaseController{
 
     @Autowired
@@ -30,6 +47,54 @@ public class UserController extends BaseController{
 
     @Autowired
     private HttpServletRequest httpServletRequest;
+
+
+//    用户注册接口
+    @RequestMapping(value = "/register", method = {RequestMethod.POST},consumes = {CONTENT_TYPE_FORMED})
+    @ResponseBody
+    public CommonReturnType register(@RequestParam(name="telephone")String telephone,
+                                     @RequestParam(name = "otpCode")String otpCode,
+                                     @RequestParam(name = "name")String name,
+                                     @RequestParam(name = "gender")Integer gender,
+                                     @RequestParam(name = "age")Integer age,
+                                     @RequestParam(name = "password")String password) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
+
+//        验证手机号和用户对应的otpCode是否相符合
+        String inSessionOtpCode = (String) this.httpServletRequest.getSession().getAttribute(telephone);
+        if(!com.alibaba.druid.util.StringUtils.equals(inSessionOtpCode, otpCode)){
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "短信验证码不符合");
+        }
+
+//        如果当前用户的otpCode是合法的，则进入用户注册流程
+//        用户注册流程中，需要有一个service去处理对应用户注册的请求
+
+        //用户注册流程
+        UserModel userModel = new UserModel();
+        userModel.setName(name);
+        userModel.setGender(new Byte(String.valueOf(gender.intValue())));
+        userModel.setAge(age);
+        userModel.setTelphone(telephone);
+        userModel.setRegisterMode("byphone");
+        userModel.setEncrptPassword(this.EncodeByMd5(password));
+
+        userService.register(userModel);
+        return CommonReturnType.creat(null);
+    }
+
+    public String EncodeByMd5(String str) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+        //确定计算方法
+        MessageDigest md5 = MessageDigest.getInstance("MD5");
+        BASE64Encoder base64en = new BASE64Encoder();
+
+        //加密字符串
+        String newstr = base64en.encode(md5.digest(str.getBytes("utf-8")));
+        return newstr;
+
+
+    }
+
+
+
 
 
 //    用户获取OPT短信接口
@@ -43,7 +108,7 @@ public class UserController extends BaseController{
 //        此处生成0~99999的随机数
         int randomInt = random.nextInt(99999);
         randomInt += 10000;
-        String optCode = String.valueOf(randomInt);
+        String otpCode = String.valueOf(randomInt);
 
 
 //        2、 将OPT验证码同对应的手机号关联,此处使用httpSession的方式绑定他的手机号与OTPCODE
@@ -59,12 +124,23 @@ public class UserController extends BaseController{
          * setAttribute("name",value)有两个参数第一个是由你定义的名称，
          * 第二个是要存入的值,在相邻页面你可以用 httpServletRequest.getAttribute("name")获取到value
          */
-        httpServletRequest.getSession().setAttribute(telephone, optCode);
+        httpServletRequest.getSession().setAttribute(telephone, otpCode);
 
 
 //        3. 将OPT验证码通过短信通道发送给用户（此处省略，这里可以采用阿里云等短信方式）
-//           此处将optCode打印到控制台
-        System.out.println("telephone = "+ telephone + " & optCode = "+optCode);
+//           此处将otpCode打印到控制台
+        System.out.println("telephone = "+ telephone + " & otpCode = "+otpCode);
+
+//        ResponseCookie cookie = ResponseCookie.from("JSESSIONID", request.getSession().getId())
+//                .httpOnly(true)
+//                .secure(true)
+//                .domain("localhost")
+//                .path("/")
+//                .maxAge(3600)
+//                .sameSite("None")
+//                .build()
+//                ;
+//        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
         return CommonReturnType.creat(null);
 
