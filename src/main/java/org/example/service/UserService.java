@@ -9,4 +9,9 @@ public interface UserService {
     UserModel getUserById(Integer id);
 //    处理用户注册的请求
     void register(UserModel userModel) throws BusinessException;
+
+//    验证登录
+//    telephone：用户注册手机
+//    password：用户加密后的密码
+    UserModel validateLogin(String telephone, String encrptPassword) throws BusinessException;
 }

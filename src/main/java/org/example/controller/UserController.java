@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tomcat.util.security.MD5Encoder;
 import org.example.controller.viewobject.UserVO;
 import org.example.error.BusinessException;
@@ -47,6 +48,30 @@ public class UserController extends BaseController{
 
     @Autowired
     private HttpServletRequest httpServletRequest;
+
+    //用户登陆接口
+    @RequestMapping(value = "/login", method = {RequestMethod.POST},consumes = {CONTENT_TYPE_FORMED})
+    @ResponseBody
+    public CommonReturnType login(@RequestParam(name = "telephone")String telephone,
+                                  @RequestParam(name = "password")String password) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
+        //入参校验,判断手机号和密码不为空
+        if(org.apache.commons.lang3.StringUtils.isEmpty(telephone)||
+                StringUtils.isEmpty(password)){
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
+        }
+
+        //用户登录服务，用来校验用户登录是否合法
+        UserModel userModel = userService.validateLogin(telephone, this.EncodeByMd5(password));
+
+//        将登陆凭证加入到用户登录成功地Session内
+        this.httpServletRequest.getSession().setAttribute("IS_LOGIN",true);
+        this.httpServletRequest.getSession().setAttribute("LOGIN_USER", userModel);
+
+        return CommonReturnType.creat(null);
+
+
+    }
+
 
 
 //    用户注册接口
