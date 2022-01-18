@@ -73,6 +73,13 @@
           <version>3.7</version>
       </dependency>
 
+<!--      校验代码优化组件-->
+      <dependency>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-validator</artifactId>
+          <version>5.2.4.Final</version>
+      </dependency>
+
 
   </dependencies>
 

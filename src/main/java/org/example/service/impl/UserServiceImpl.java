@@ -9,11 +9,15 @@ import org.example.error.BusinessException;
 import org.example.error.EmBusinessError;
 import org.example.service.UserService;
 import org.example.service.model.UserModel;
+import org.example.validator.ValidationResult;
+import org.example.validator.ValidatorImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.validation.Validation;
 
 
 //@Service通过这个标记指明UserServiceImpl是我们的一个spring service
@@ -28,6 +32,10 @@ public class UserServiceImpl implements UserService {
 //    引入UserPasswordDOMapper
     @Autowired
     private UserPasswordDOMapper userPasswordDOMapper;
+
+//    引入validator的bean
+    @Autowired
+    private ValidatorImpl validator;
 
 //    覆盖方法
     @Override
@@ -71,14 +79,18 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
         }
 
-//        用apache-commons做校验
-        if(StringUtils.isEmpty(userModel.getName())   //String判null
-            || userModel.getAge()==null   // 数字判null
-            || userModel.getGender()==null
-            || StringUtils.isEmpty(userModel.getTelphone())){
-            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
-        }
+////        用apache-commons做校验
+//        if(StringUtils.isEmpty(userModel.getName())   //String判null
+//            || userModel.getAge()==null   // 数字判null
+//            || userModel.getGender()==null
+//            || StringUtils.isEmpty(userModel.getTelphone())){
+//            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
+//        }
 
+        ValidationResult result = validator.validate(userModel);
+        if(result.isHasErrors()){
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, result.getErrMsg());
+        }
 
 
 //        实现model->dataobject方法

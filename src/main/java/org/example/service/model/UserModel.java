@@ -1,19 +1,37 @@
 package org.example.service.model;
 
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 //UserModel的model层面是真正意义上我们处理业务的核心模型
 //而dataobject仅仅是数据库的一个映射
 public class UserModel {
 
 //    用户对象的信息字段，和数据库中对应
     private Integer id;
+
+//    @NotBlank表示name不能为null字符串，也不能为null。否则报message错误
+    @NotBlank(message = "用户名不能为空")
     private String name;
+
+//    @NotNull表示字段不能为null，否则报message错误
+    @NotNull(message = "性别不能不填")
     private Byte gender;
+
+    @NotNull(message = "年龄不能不填写")
+    @Min(value = 0, message = "年龄必须大于0")   //规定年龄最小值
+    @Max(value = 150, message = "年龄必须小于于150")   //规定年龄最大值
     private Integer age;
+
+    @NotBlank(message = "手机号不能为空")
     private String telphone;
     private String registerMode;
     private String thirdPartId;
 
+    @NotBlank(message = "密码不能为空")
     private String encrptPassword;
 
 
