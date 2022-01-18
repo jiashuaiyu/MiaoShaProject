@@ -169,7 +169,7 @@
             <verbose>true</verbose>
 
 <!--            允许自动覆盖，实际项目开发中不能设置成true，会覆盖别人的成果-->
-            <overwrite>true</overwrite>
+            <overwrite>false</overwrite>
 
 <!--            mybatis generation 配置文件的路径-->
             <configurationFile>
@@ -179,6 +179,20 @@
           </configuration>
 
         </plugin>
+
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <configuration>
+                  <source>1.8</source>
+                  <target>1.8</target>
+              </configuration>
+          </plugin>
+          <plugin>
+              <groupId>org.springframework.boot</groupId>
+              <artifactId>spring-boot-maven-plugin</artifactId>
+          </plugin>
+
 
       </plugins>
     </pluginManagement>

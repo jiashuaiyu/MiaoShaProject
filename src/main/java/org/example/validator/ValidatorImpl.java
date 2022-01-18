@@ -43,7 +43,6 @@ public class ValidatorImpl implements InitializingBean {
     }
 
 
-
 //    spring中的bean初始化完成后，会回调afterPropertiesSet()
     @Override
     public void afterPropertiesSet() throws Exception {
